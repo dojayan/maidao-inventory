@@ -90,13 +90,24 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 }
 h1{margin:0;color:#fff;font-weight:600;font-size:clamp(38px,9vw,70px);line-height:1.04;letter-spacing:-0.028em}
 .tagline{margin:14px 0 0;font-size:16px;color:rgba(255,255,255,.68)}
-/* 进销项 / 变更记录页：油画收成窄幅题条，把版面让给数据 */
-body[data-view="ledger"] .hero-inner,
+/* 变更记录页：油画收成窄幅题条，把版面让给数据 */
 body[data-view="logs"] .hero-inner{min-height:132px;padding:34px 22px 22px}
-body[data-view="ledger"] h1,
 body[data-view="logs"] h1{font-size:clamp(26px,3.4vw,38px)}
-body[data-view="ledger"] .tagline,
 body[data-view="logs"] .tagline{display:none}
+
+/* ===== 开场动画：极缓位移 + 淡入，逐层错开（苹果式） ===== */
+@keyframes aArt{from{opacity:.55;transform:scale(1.05)}to{opacity:1;transform:scale(1)}}
+@keyframes aRise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes aDrop{from{opacity:0;transform:translateY(-7px)}to{opacity:1;transform:translateY(0)}}
+@keyframes aView{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.hero-art{animation:aArt 1.8s cubic-bezier(.16,1,.3,1) both}
+.hero-inner h1{animation:aRise .95s cubic-bezier(.16,1,.3,1) .16s both}
+.tagline{animation:aRise .95s cubic-bezier(.16,1,.3,1) .32s both}
+.top{animation:aDrop .7s cubic-bezier(.16,1,.3,1) .06s both}
+.tabs{animation:aDrop .7s cubic-bezier(.16,1,.3,1) .14s both}
+.panel{animation:aRise .9s cubic-bezier(.16,1,.3,1) .36s both}
+.results{animation:aRise 1s cubic-bezier(.16,1,.3,1) .48s both}
+.page.enter{animation:aView .52s cubic-bezier(.16,1,.3,1) both}
 
 /* ===== 搜索 ===== */
 .panel{padding:40px 0 6px}
@@ -188,6 +199,29 @@ tbody tr:hover .chip{transform:scale(1.04)}
 }
 .op-btn:hover{transform:scale(1.08);text-decoration:underline;text-underline-offset:3px}
 .op-btn.danger{color:var(--red)}
+
+/* ===== 产品介绍标识 ===== */
+.desc-badge{
+  position:relative;display:inline-flex;align-items:center;justify-content:center;
+  width:26px;height:26px;padding:0;margin-left:9px;vertical-align:-3px;
+  border-radius:50%;border:1px solid rgba(18,58,92,.16);background:#fff;color:rgba(18,58,92,.42);
+  font-size:12px;font-weight:600;line-height:1;cursor:pointer;
+  transition:transform .3s var(--ease),background .2s,color .2s,border-color .2s,box-shadow .3s var(--ease);
+}
+.desc-badge::after{content:"";position:absolute;inset:-9px}
+.desc-badge:hover{transform:scale(1.14);background:var(--mist);color:var(--blue);border-color:rgba(18,58,92,.26);box-shadow:0 6px 16px rgba(16,40,63,.09)}
+.desc-badge:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.desc-badge.has{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 2px 8px rgba(18,58,92,.18)}
+.desc-badge.has:hover{background:var(--blue-deep);border-color:var(--blue-deep);box-shadow:0 8px 18px rgba(18,58,92,.24)}
+@media (max-width:639px){ .desc-badge{width:24px;height:24px;margin-left:8px} }
+
+/* 介绍弹层 */
+.desc-input{
+  min-height:132px;resize:vertical;line-height:1.65;
+  font-family:inherit;font-size:16px;
+}
+.desc-meta{font-size:13px;color:var(--muted);padding:2px 0 12px}
+.desc-meta b{color:var(--ink);font-weight:600}
 
 .state{padding:26px 0 8px;color:var(--muted);font-size:16px;line-height:1.7}
 .state strong{color:var(--ink);font-weight:600}
@@ -304,12 +338,6 @@ footer button{background:none;border:0;color:var(--blue);font-size:13px;padding:
   .tb-items .c-small{grid-area:small}
   .tb-items .c-qty{grid-area:qty;justify-self:end}
   .tb-items .c-op{grid-area:ops;justify-self:end;display:flex;gap:14px}
-  .tb-ledger tbody tr{grid-template-columns:1fr auto;grid-template-areas:"date type" "name name" "qty op"}
-  .tb-ledger .c-date{grid-area:date;font-size:14px;color:var(--muted)}
-  .tb-ledger .c-type{grid-area:type;justify-self:end}
-  .tb-ledger .c-name{grid-area:name;font-size:16px}
-  .tb-ledger .c-qty{grid-area:qty}
-  .tb-ledger .c-op{grid-area:op;justify-self:end;display:flex;gap:14px}
   .tb-logs tbody tr{grid-template-columns:1fr auto;grid-template-areas:"date act" "who who" "name name"}
   .tb-logs .c-date{grid-area:date;font-size:14px;color:var(--muted)}
   .tb-logs .c-act{grid-area:act;justify-self:end}
@@ -342,7 +370,6 @@ footer button{background:none;border:0;color:var(--blue);font-size:13px;padding:
 <nav class="tabs" aria-label="页面切换">
   <div class="wrap">
     <button class="tab" type="button" data-view="query" aria-selected="true">库存查询</button>
-    <button class="tab" type="button" data-view="ledger" aria-selected="false">进销项</button>
     <button class="tab" type="button" data-view="logs" aria-selected="false">变更记录</button>
   </div>
 </nav>
@@ -368,52 +395,13 @@ footer button{background:none;border:0;color:var(--blue);font-size:13px;padding:
           </div>
           <button class="ghost-btn" id="allBtn" type="button" aria-pressed="false">查看全部商品库存位置</button>
         </div>
-        <p class="hint">只按商品名称匹配，支持名称片段。每条记录同时给出货架大位置、小位置与库存数量。</p>
+        <p class="hint">只按商品名称匹配，支持名称片段。每条记录同时给出货架大位置、小位置与库存数量；名称后面那个 <strong>i</strong> 圆圈是产品介绍，点开可以看、也可以自己补写。</p>
       </div>
     </section>
 
     <section class="results">
       <div class="wrap" id="results" aria-live="polite"></div>
     </section>
-  </section>
-
-  <!-- ===== 视图：进销项 ===== -->
-  <section class="page" id="viewLedger" hidden>
-    <div class="wrap">
-      <div class="res-head">
-        <h2 class="res-title">进销项台账</h2>
-        <div class="res-count" id="ledgerCount">—</div>
-      </div>
-      <div class="cards" id="ledgerCards"></div>
-      <form class="form-card" id="ledgerForm" autocomplete="off">
-        <div class="form-grid">
-          <div class="cell">
-            <label for="lgDate">日期</label>
-            <input class="inp" id="lgDate" type="date">
-          </div>
-          <div class="cell">
-            <label for="lgItem">商品</label>
-            <select class="inp" id="lgItem"></select>
-          </div>
-          <div class="cell">
-            <label for="lgQty">数量</label>
-            <input class="inp" id="lgQty" type="number" min="1" step="1" inputmode="numeric" placeholder="件数">
-          </div>
-          <div class="cell">
-            <label for="lgType">类型</label>
-            <select class="inp" id="lgType">
-              <option value="in">进货</option>
-              <option value="out">销售</option>
-            </select>
-          </div>
-        </div>
-        <div class="modal-foot" style="padding-top:14px">
-          <div class="modal-note" id="lgNote">进货会增加库存，销售会扣减库存；每次录入都会记一条变更。</div>
-          <button class="solid-btn" id="lgSubmit" type="submit" style="padding:0 26px">记一笔</button>
-        </div>
-      </form>
-      <div class="table-wrap" id="ledgerTable" style="margin-top:18px"></div>
-    </div>
   </section>
 
   <!-- ===== 视图：变更记录 ===== -->
@@ -428,8 +416,6 @@ footer button{background:none;border:0;color:var(--blue);font-size:13px;padding:
         <button class="mini-btn" type="button" data-act="新增" aria-pressed="false">新增</button>
         <button class="mini-btn" type="button" data-act="修改" aria-pressed="false">修改</button>
         <button class="mini-btn" type="button" data-act="删除" aria-pressed="false">删除</button>
-        <button class="mini-btn" type="button" data-act="进货" aria-pressed="false">进货</button>
-        <button class="mini-btn" type="button" data-act="销售" aria-pressed="false">销售</button>
       </div>
       <div class="table-wrap" id="logsTable" style="margin-top:16px"></div>
     </div>
@@ -469,8 +455,7 @@ const LS_KEY = 'maidao_ledger_v2';
 const DEFAULT_SRC = '油封位置.xlsx';
 
 const state = {
-  items: [],      /* {id,name,big,small,note,qty} */
-  ledger: [],     /* {id,date,itemId,name,big,small,qty,type,at} */
+  items: [],      /* {id,name,big,small,note,qty,desc} */
   logs: [],       /* {id,at,who,act,name,detail} */
   operator: '',
   src: DEFAULT_SRC,
@@ -526,12 +511,14 @@ function loadSaved(){
     if(!raw) return false;
     const obj = JSON.parse(raw);
     if(!obj || !Array.isArray(obj.items) || !obj.items.length) return false;
-    state.items = obj.items;
-    state.ledger = Array.isArray(obj.ledger) ? obj.ledger : [];
+    state.items = obj.items.map(function(r){
+      r.desc = (r.desc === null || r.desc === undefined) ? '' : String(r.desc);
+      return r;
+    });
     state.logs = Array.isArray(obj.logs) ? obj.logs : [];
     state.operator = obj.operator || '';
     state.src = obj.src || '已保存的台账';
-    state.seq = obj.seq || (state.items.length + state.ledger.length + 10);
+    state.seq = obj.seq || (state.items.length + 10);
     return true;
   }catch(e){ return false; }
 }
@@ -539,10 +526,9 @@ function loadSaved(){
 /* ---- 初始数据 ---- */
 function seedFromRaw(){
   state.items = RAW_DATA.map(function(r, i){
-    return { id: 'i' + (i + 1), name: r.name, big: r.big, small: r.small, note: r.note || '', qty: null };
+    return { id: 'i' + (i + 1), name: r.name, big: r.big, small: r.small, note: r.note || '', qty: null, desc: '' };
   });
   state.seq = state.items.length + 1;
-  state.ledger = [];
   state.logs = [];
   state.src = DEFAULT_SRC;
   pushLog('新增', '原始台账', '导入 ' + state.items.length + ' 条商品位置记录（数量待盘点）');
@@ -588,9 +574,15 @@ function nameCell(name, q){
   return '<span class="pname">' + esc(name.slice(0, start)) + '<mark>' +
     esc(name.slice(start, start + n.length)) + '</mark>' + esc(name.slice(start + n.length)) + '</span>';
 }
+function descBadge(r){
+  const has = txt(r.desc) !== '';
+  const tip = has ? '查看 / 修改产品介绍' : '这个商品还没有写介绍，点开补充';
+  return '<button class="desc-badge' + (has ? ' has' : '') + '" type="button" data-desc="' + r.id + '"' +
+    ' title="' + tip + '" aria-label="' + esc(r.name + '：' + tip) + '">i</button>';
+}
 function itemRow(r, q){
   const qv = qtyText(r.qty);
-  return '<tr data-id="' + r.id + '"><td class="c-name">' + nameCell(r.name, q) + '</td>' +
+  return '<tr data-id="' + r.id + '"><td class="c-name">' + nameCell(r.name, q) + descBadge(r) + '</td>' +
     '<td class="c-big"><span class="chip chip-big">' + esc(r.big) + '</span>' +
       (r.note ? '<span class="side-note">' + esc(r.note) + '</span>' : '') + '</td>' +
     '<td class="c-small"><span class="chip chip-small">' + esc(r.small) + '</span></td>' +
@@ -663,62 +655,6 @@ function renderAll(){
     itemTable(sortedItems(base), '');
 }
 
-/* ---- 渲染：进销项 ---- */
-function itemOptions(){
-  const list = state.items.slice().sort(function(a, b){
-    const x = order(a.name, b.name);
-    return x ? x : order(a.big + a.small, b.big + b.small);
-  });
-  return list.map(function(r){
-    return '<option value="' + r.id + '">' + esc(r.name) + '（' + esc(r.big) + ' · ' + esc(r.small) + '）</option>';
-  }).join('');
-}
-function renderLedger(){
-  const ym = todayStr().slice(0, 7);
-  let inSum = 0, outSum = 0;
-  state.ledger.forEach(function(e){
-    if(String(e.date).slice(0, 7) !== ym) return;
-    if(e.type === 'in') inSum += Number(e.qty) || 0;
-    else outSum += Number(e.qty) || 0;
-  });
-  let stockSum = 0, counted = 0;
-  state.items.forEach(function(r){
-    if(r.qty === null || r.qty === undefined || r.qty === '') return;
-    counted += 1;
-    stockSum += Number(r.qty) || 0;
-  });
-  $('ledgerCards').innerHTML =
-    '<div class="card"><div class="card-k">本月进货</div><div class="card-v">' + inSum + '<small>件</small></div></div>' +
-    '<div class="card"><div class="card-k">本月销售</div><div class="card-v">' + outSum + '<small>件</small></div></div>' +
-    '<div class="card"><div class="card-k">账面库存合计</div><div class="card-v">' + (counted ? stockSum : '—') +
-      '<small>' + (counted ? '来自 ' + counted + ' 条' : '未录入数量') + '</small></div></div>' +
-    '<div class="card"><div class="card-k">进销记录</div><div class="card-v">' + state.ledger.length + '<small>笔</small></div></div>';
-
-  if(OPT_DIRTY){ $('lgItem').innerHTML = itemOptions(); OPT_DIRTY = false; }
-
-  const rows = state.ledger.slice().sort(function(a, b){
-    const x = order(b.date, a.date);
-    return x ? x : order(b.at, a.at);
-  });
-  $('ledgerCount').textContent = rows.length ? '共 ' + rows.length + ' 笔' : '还没有记录';
-  if(!rows.length){
-    $('ledgerTable').innerHTML = '<div class="empty-cell">还没有进销记录。在上面选商品、填数量、选类型，点「记一笔」即可；库存会自动加减并留下记录。</div>';
-    return;
-  }
-  let html = '<table class="tb tb-ledger"><colgroup><col style="width:18%"><col style="width:38%"><col style="width:13%"><col style="width:13%"><col style="width:18%">' +
-    '</colgroup><thead><tr><th scope="col">日期</th><th scope="col">商品</th><th scope="col">类型</th>' +
-    '<th scope="col">数量</th><th scope="col">操作</th></tr></thead><tbody>';
-  rows.forEach(function(e){
-    const isIn = e.type === 'in';
-    html += '<tr><td class="c-date">' + esc(e.date) + '</td>' +
-      '<td class="c-name">' + esc(e.name) + '<span class="side-note">' + esc(e.big) + ' · ' + esc(e.small) + '</span></td>' +
-      '<td class="c-type"><span class="type-tag ' + (isIn ? 'type-in' : 'type-out') + '">' + (isIn ? '进货' : '销售') + '</span></td>' +
-      '<td class="c-qty"><span class="delta ' + (isIn ? 'up' : 'down') + '">' + (isIn ? '+' : '−') + esc(e.qty) + '</span></td>' +
-      '<td class="c-op"><button class="op-btn danger" type="button" data-lgedel="' + e.id + '">撤销</button></td></tr>';
-  });
-  $('ledgerTable').innerHTML = html + '</tbody></table>';
-}
-
 /* ---- 渲染：变更记录 ---- */
 function renderLogs(){
   const rows = state.logs.filter(function(l){ return LOGFILTER === '全部' || l.act === LOGFILTER; });
@@ -748,11 +684,9 @@ let VIEW = 'idle';
 let Q = '';
 let FILTER = '全部';
 let LOGFILTER = '全部';
-let OPT_DIRTY = true;
 let NAV = 'query';
 
 function render(){
-  if(NAV === 'ledger'){ renderLedger(); return; }
   if(NAV === 'logs'){ renderLogs(); return; }
   if(VIEW === 'search'){ renderSearch(); return; }
   if(VIEW === 'all'){ renderAll(); return; }
@@ -766,9 +700,12 @@ function syncAllBtn(){
 }
 function renderAllUI(){
   render(); syncAllBtn();
-  let counted = 0;
-  state.items.forEach(function(r){ if(r.qty !== null && r.qty !== undefined && r.qty !== '') counted += 1; });
-  $('srcInfo').textContent = state.items.length + ' 条 · 已录数量 ' + counted + ' 条 · ' + state.src;
+  let counted = 0, written = 0;
+  state.items.forEach(function(r){
+    if(r.qty !== null && r.qty !== undefined && r.qty !== '') counted += 1;
+    if(txt(r.desc)) written += 1;
+  });
+  $('srcInfo').textContent = state.items.length + ' 条 · 已录数量 ' + counted + ' 条 · 已写介绍 ' + written + ' 条 · ' + state.src;
   $('resetBtn').hidden = (state.src === DEFAULT_SRC);
   $('opBtn').textContent = '操作人：' + (state.operator || '未署名');
 }
@@ -776,18 +713,18 @@ function setNav(key){
   NAV = key;
   document.body.dataset.view = key;
   $('viewQuery').hidden = key !== 'query';
-  $('viewLedger').hidden = key !== 'ledger';
   $('viewLogs').hidden = key !== 'logs';
   Array.prototype.forEach.call(document.querySelectorAll('.tab'), function(t){
     t.setAttribute('aria-selected', t.getAttribute('data-view') === key ? 'true' : 'false');
   });
-  if(key === 'ledger'){
-    if(!$('lgDate').value) $('lgDate').value = todayStr();
-    renderLedger();
-  } else if(key === 'logs'){
+  if(key === 'logs'){
     renderLogs();
+    const el = $('viewLogs');
+    el.classList.remove('enter'); void el.offsetWidth; el.classList.add('enter');
   } else {
     render();
+    const el = $('viewQuery');
+    if(el.classList.contains('enter')){ el.classList.remove('enter'); void el.offsetWidth; el.classList.add('enter'); }
   }
   if(history && history.replaceState) history.replaceState(null, '', '#' + key);
 }
@@ -841,7 +778,7 @@ function openItemEditor(item){
       fld('货架小位置', 'mSmall', v.small, { placeholder: '例如 4-4' }) +
       fld('库存数量', 'mQty', v.qty === null ? '' : v.qty, { type: 'number', placeholder: '留空表示未录入', inputmode: 'numeric' }) +
       fld('方向备注（选填）', 'mNote', v.note, { placeholder: '例如 左侧' }),
-    note: '保存后会新增一条变更记录，写明改了什么、从多少改成多少。',
+    note: '保存后会新增一条变更记录，写明改了什么、从多少改成多少；产品介绍点名称旁的 i 圆圈单独编辑。',
     okText: isNew ? '添加' : '保存',
     onOk: function(){
       const name = txt($('mName').value);
@@ -859,7 +796,7 @@ function openItemEditor(item){
         qty = Math.round(n);
       }
       if(isNew){
-        state.items.push({ id: nextId('i'), name: name, big: big, small: small, note: note, qty: qty });
+        state.items.push({ id: nextId('i'), name: name, big: big, small: small, note: note, qty: qty, desc: '' });
         pushLog('新增', name, big + ' · ' + small + ' · 库存 ' + (qty === null ? '未录入' : qty));
         toast('已新增「' + name + '」');
       } else {
@@ -877,21 +814,16 @@ function openItemEditor(item){
         toast('已保存修改');
       }
       save(); closeModal(); renderAllUI();
-      if(NAV === 'ledger') updateItemOptions();
       return true;
     }
   });
-}
-function updateItemOptions(){
-  OPT_DIRTY = true;
-  if(!$('viewLedger').hidden){ $('lgItem').innerHTML = itemOptions(); OPT_DIRTY = false; }
 }
 function openItemDelete(item){
   openModal({
     title: '删除商品',
     body: '<div class="state" style="padding:0">确定删除「<strong>' + esc(item.name) + '</strong>」（' +
       esc(item.big) + ' · ' + esc(item.small) + '）吗？<br>删除后会留下一条删除记录，之后可以照着记录重新添加。</div>',
-    note: '进销项里已有的记录不会被删除。',
+    note: '删除后商品介绍也一起删除，变更记录里会留下这一条。',
     okText: '确认删除',
     onOk: function(){
       state.items = state.items.filter(function(r){ return r.id !== item.id; });
@@ -904,34 +836,29 @@ function openItemDelete(item){
   });
 }
 
-/* ---- 进销项录入 ---- */
-function submitLedger(){
-  const date = $('lgDate').value || todayStr();
-  const id = $('lgItem').value;
-  const qtyRaw = $('lgQty').value;
-  const type = $('lgType').value === 'out' ? 'out' : 'in';
-  const item = findItem(id);
-  if(!item){ toast('请先选择商品'); return; }
-  const n = Number(qtyRaw);
-  if(!qtyRaw || !isFinite(n) || n <= 0){ toast('数量要填大于 0 的整数'); return; }
-  const q = Math.round(n);
-  const before = (item.qty === null || item.qty === undefined || item.qty === '') ? 0 : Number(item.qty);
-  const after = type === 'in' ? before + q : before - q;
-  const hadQty = !(item.qty === null || item.qty === undefined || item.qty === '');
-  state.ledger.unshift({
-    id: nextId('e'), date: date, itemId: item.id, name: item.name,
-    big: item.big, small: item.small, qty: q, type: type, at: nowStr()
+/* ---- 产品介绍 ---- */
+function openDesc(item){
+  const cur = txt(item.desc);
+  openModal({
+    title: '产品介绍',
+    body: '<div class="desc-meta"><b>' + esc(item.name) + '</b> · 大位置 ' + esc(item.big) +
+        ' · 小位置 ' + esc(item.small) + '</div>' +
+      '<div class="fld"><label for="mDesc">这个产品是什么、适配什么车、要注意什么</label>' +
+      '<textarea class="inp desc-input" id="mDesc" rows="6" placeholder="暂时不知道写什么可以先空着，以后想好了再来补。">' +
+      esc(cur) + '</textarea></div>' +
+      '<div class="desc-meta">' + (cur ? '当前 ' + cur.length + ' 字' : '现在是空的') + '</div>',
+    note: '介绍跟着商品一起保存，导出备份时也会一起带走。',
+    okText: '保存介绍',
+    onOk: function(){
+      const v = txt($('mDesc').value);
+      if(v === txt(item.desc)){ closeModal(); return true; }
+      item.desc = v;
+      pushLog('修改', item.name, v ? '写了产品介绍（' + v.length + ' 字）' : '清空了产品介绍');
+      save(); closeModal(); renderAllUI();
+      toast(v ? '介绍已保存：' + item.name : '已清空介绍：' + item.name);
+      return true;
+    }
   });
-  item.qty = after;
-  pushLog(type === 'in' ? '进货' : '销售', item.name,
-    (type === 'in' ? '+' : '−') + q + '；库存 ' + (hadQty ? before : '未录入→按 0 计') + ' → ' + after);
-  save();
-  $('lgQty').value = '';
-  renderAllUI();
-  renderLedger();
-  toast((type === 'in' ? '已记进货 ' : '已记销售 ') + q + ' 件，库存现在 ' + after);
-  if(!hadQty) toast('该商品原来没录库存，已按 0 计算：' + after);
-  if(after < 0) toast('注意：库存已变成负数（' + after + '），请核对');
 }
 
 /* ---- 导入 / 导出 ---- */
@@ -974,11 +901,11 @@ const RE_SMALL = /^\d+-\d+$/;
 function parseSheetRows(rawRows){
   const rows = rawRows.map(function(r){ return (Array.isArray(r) ? r : []).map(function(c){ return txt(c); }); });
   const recs = [];
-  let headerAt = -1, cName = -1, cBig = -1, cSmall = -1, cQty = -1;
+  let headerAt = -1, cName = -1, cBig = -1, cSmall = -1, cQty = -1, cDesc = -1;
   for(let i = 0; i < Math.min(rows.length, 12); i++){
     const cells = rows[i];
     if(!cells) continue;
-    let n = -1, b = -1, m = -1, q = -1;
+    let n = -1, b = -1, m = -1, q = -1, d = -1;
     for(let j = 0; j < cells.length; j++){
       const c = cells[j];
       if(!c) continue;
@@ -986,8 +913,9 @@ function parseSheetRows(rawRows){
       if(b < 0 && /大位置|大区位|货架大|大区/.test(c)) b = j;
       if(m < 0 && /小位置|小点位|细分|点位/.test(c)) m = j;
       if(q < 0 && /库存|数量|结存/.test(c)) q = j;
+      if(d < 0 && /介绍|说明|描述/.test(c)) d = j;
     }
-    if(n >= 0 && b >= 0 && m >= 0){ headerAt = i; cName = n; cBig = b; cSmall = m; cQty = q; break; }
+    if(n >= 0 && b >= 0 && m >= 0){ headerAt = i; cName = n; cBig = b; cSmall = m; cQty = q; cDesc = d; break; }
   }
   if(headerAt >= 0){
     for(let i = headerAt + 1; i < rows.length; i++){
@@ -1001,7 +929,8 @@ function parseSheetRows(rawRows){
         big: mm ? (mm[1].toUpperCase() + '-' + mm[2]) : big,
         note: mm && mm[3] ? mm[3] + '侧' : '',
         small: small,
-        qty: qv && isFinite(Number(qv)) ? Math.round(Number(qv)) : null
+        qty: qv && isFinite(Number(qv)) ? Math.round(Number(qv)) : null,
+        desc: cDesc >= 0 ? txt(r[cDesc]) : ''
       });
     }
     return recs;
@@ -1060,10 +989,10 @@ function exportJSON(){
 }
 function exportCSV(rows){
   const list = rows || sortedItems(state.items);
-  const head = ['商品名称','货架大位置','货架小位置','方向备注','库存数量'];
+  const head = ['商品名称','货架大位置','货架小位置','方向备注','库存数量','产品介绍'];
   const body = list.map(function(r){
     const q = (r.qty === null || r.qty === undefined) ? '' : r.qty;
-    return [r.name, r.big, r.small, r.note || '', q].map(function(c){
+    return [r.name, r.big, r.small, r.note || '', q, r.desc || ''].map(function(c){
       const s = String(c == null ? '' : c);
       return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
     }).join(',');
@@ -1078,15 +1007,17 @@ async function handleFile(file){
     if(/\.json$/.test(lower)){
       const obj = JSON.parse(await file.text());
       if(!obj || !Array.isArray(obj.items) || !obj.items.length){ toast('这个备份文件里没有商品数据'); return; }
-      state.items = obj.items;
-      state.ledger = Array.isArray(obj.ledger) ? obj.ledger : state.ledger;
+      state.items = obj.items.map(function(r){
+        r.desc = (r.desc === null || r.desc === undefined) ? '' : String(r.desc);
+        return r;
+      });
       state.logs = Array.isArray(obj.logs) ? obj.logs : state.logs;
       state.operator = obj.operator || state.operator;
       state.src = '备份还原 · ' + file.name;
-      state.seq = obj.seq || (state.items.length + state.ledger.length + 10);
+      state.seq = obj.seq || (state.items.length + 10);
       pushLog('新增', '备份还原', '从 ' + file.name + ' 还原 ' + state.items.length + ' 条');
       save(); VIEW = 'idle'; Q = ''; $('q').value = '';
-      updateItemOptions(); renderAllUI();
+      renderAllUI();
       toast('已从备份还原 ' + state.items.length + ' 条记录');
       return;
     }
@@ -1096,14 +1027,14 @@ async function handleFile(file){
     const recs = extractRecords(sheets);
     if(!recs.length){ toast('没有识别到商品数据，请检查表格是否含商品名称 / 大位置 / 小位置'); return; }
     state.items = recs.map(function(r, i){
-      return { id: 'i' + (i + 1), name: r.name, big: r.big, small: r.small, note: r.note || '', qty: r.qty };
+      return { id: 'i' + (i + 1), name: r.name, big: r.big, small: r.small, note: r.note || '', qty: r.qty, desc: r.desc || '' };
     });
     state.src = file.name;
     state.seq = state.items.length + 1;
     FILTER = '全部'; VIEW = 'idle'; Q = ''; $('q').value = '';
     pushLog('新增', '导入台账', '导入 ' + file.name + '，共 ' + state.items.length + ' 条');
-    save(); updateItemOptions(); renderAllUI();
-    toast('已载入 ' + state.items.length + ' 条记录（原进销项与变更记录保留）');
+    save(); renderAllUI();
+    toast('已载入 ' + state.items.length + ' 条记录（变更记录保留）');
   }catch(err){
     toast('表格读取失败：' + (err && err.message ? err.message : '格式不支持'));
   }
@@ -1112,13 +1043,13 @@ async function handleFile(file){
 /* ---- 恢复原始数据 ---- */
 function resetData(){
   state.items = RAW_DATA.map(function(r, i){
-    return { id: 'i' + (i + 1), name: r.name, big: r.big, small: r.small, note: r.note || '', qty: null };
+    return { id: 'i' + (i + 1), name: r.name, big: r.big, small: r.small, note: r.note || '', qty: null, desc: '' };
   });
   state.seq = state.items.length + 1;
   state.src = DEFAULT_SRC;
-  pushLog('修改', '全部商品', '恢复为原始台账 ' + state.items.length + ' 条，已录入的库存清空');
+  pushLog('修改', '全部商品', '恢复为原始台账 ' + state.items.length + ' 条，已录入的库存与介绍清空');
   save(); FILTER = '全部'; VIEW = 'idle'; Q = ''; $('q').value = '';
-  updateItemOptions(); renderAllUI();
+  renderAllUI();
   toast('已恢复原始数据');
 }
 
@@ -1167,6 +1098,9 @@ document.addEventListener('click', function(e){
   const neu = t.closest('[data-new]');
   if(neu){ openItemEditor(null); return; }
 
+  const dsc = t.closest('[data-desc]');
+  if(dsc){ const it = findItem(dsc.getAttribute('data-desc')); if(it) openDesc(it); return; }
+
   const edit = t.closest('[data-edit]');
   if(edit){ const it = findItem(edit.getAttribute('data-edit')); if(it) openItemEditor(it); return; }
 
@@ -1176,47 +1110,12 @@ document.addEventListener('click', function(e){
   const f = t.closest('.filter');
   if(f){ FILTER = f.getAttribute('data-big'); render(); return; }
 
-  const lgdel = t.closest('[data-lgedel]');
-  if(lgdel){ undoLedger(lgdel.getAttribute('data-lgedel')); return; }
-
   const lgf = t.closest('#logsFilter .mini-btn');
   if(lgf){ LOGFILTER = lgf.getAttribute('data-act'); renderLogs(); return; }
 
   const exp = t.closest('[data-export]');
   if(exp){ exportCSV(); return; }
 });
-
-function undoLedger(id){
-  const entry = state.ledger.filter(function(x){ return x.id === id; })[0];
-  if(!entry){ return; }
-  openModal({
-    title: '撤销这笔进销项',
-    body: '<div class="state" style="padding:0">撤销后：<strong>' + esc(entry.name) + '</strong>（' +
-      esc(entry.date) + '，' + (entry.type === 'in' ? '进货' : '销售') + ' ' + esc(entry.qty) + ' 件）<br>' +
-      '库存会反向调整，并留下一条撤销记录。</div>',
-    note: '只删除这一笔记录，其他记录不受影响。',
-    okText: '确认撤销',
-    onOk: function(){
-      const item = findItem(entry.itemId);
-      const q = Number(entry.qty) || 0;
-      const back = entry.type === 'in' ? -q : q;
-      if(item){
-        const before = item.qty === null || item.qty === undefined ? 0 : Number(item.qty);
-        item.qty = before + back;
-        pushLog('修改', entry.name, '撤销' + (entry.type === 'in' ? '进货' : '销售') + ' ' + q +
-          '；库存 ' + before + ' → ' + item.qty);
-      } else {
-        pushLog('修改', entry.name, '撤销' + (entry.type === 'in' ? '进货' : '销售') + ' ' + q + '（商品已删除）');
-      }
-      state.ledger = state.ledger.filter(function(x){ return x.id !== id; });
-      save(); closeModal(); renderAllUI(); renderLedger();
-      toast('已撤销');
-      return true;
-    }
-  });
-}
-
-$('ledgerForm').addEventListener('submit', function(e){ e.preventDefault(); submitLedger(); });
 
 $('modalOk').addEventListener('click', function(){
   if(!modalOk){ closeModal(); return; }
@@ -1256,10 +1155,8 @@ $('resetLink').addEventListener('click', resetData);
 (function init(){
   const restored = loadSaved();
   if(!restored) seedFromRaw();
-  if(!$('lgDate').value) $('lgDate').value = todayStr();
-  updateItemOptions();
   const hash = (location.hash || '').replace('#','');
-  setNav(hash === 'ledger' || hash === 'logs' ? hash : 'query');
+  setNav(hash === 'logs' ? hash : 'query');
   renderAllUI();
 })();
 </script>
