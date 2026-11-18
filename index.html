@@ -395,7 +395,7 @@ footer button{background:none;border:0;color:var(--blue);font-size:13px;padding:
           </div>
           <button class="ghost-btn" id="allBtn" type="button" aria-pressed="false">查看全部商品库存位置</button>
         </div>
-        <p class="hint">只按商品名称匹配，支持名称片段。每条记录同时给出货架大位置、小位置与库存数量；名称后面那个 <strong>i</strong> 圆圈是产品介绍，点开可以看、也可以自己补写。</p>
+        <p class="hint">按商品名称或产品介绍里的文字匹配，支持片段。每条记录同时给出货架大位置、小位置与库存数量。</p>
       </div>
     </section>
 
@@ -592,7 +592,7 @@ function itemRow(r, q){
 }
 function itemTable(rows, q){
   if(!rows.length){
-    return '<div class="empty-cell">没有找到匹配的商品。可以只输入名称的一部分，比如 <strong>4G</strong>、<strong>32*47</strong>、<strong>福特</strong>。</div>';
+    return '<div class="empty-cell">没有找到匹配的商品。名称或介绍里的字都可以只输入一部分，比如 <strong>4G</strong>、<strong>32*47</strong>、<strong>福特</strong>。</div>';
   }
   let html = '<div class="table-wrap"><table class="tb tb-items"><colgroup>' +
     '<col style="width:32%"><col style="width:21%"><col style="width:14%"><col style="width:14%"><col style="width:19%">' +
@@ -606,7 +606,7 @@ function headHTML(title, count){
 }
 function renderIdle(){
   resultsEl.innerHTML = headHTML('商品位置与库存', '共 ' + state.items.length + ' 条记录') +
-    '<div class="state">输入商品名称后点击「查询」，同时显示该商品的<strong>大位置</strong>、<strong>小位置</strong>与<strong>库存</strong>。' +
+    '<div class="state">输入商品名称或介绍里的关键词后点击「查询」，同时显示该商品的<strong>大位置</strong>、<strong>小位置</strong>与<strong>库存</strong>。' +
     '<br>不确定名称怎么写，可以直接点下面的例子试试。' +
     '<div class="examples">' +
       '<button class="example" type="button" data-ex="MR20">MR20</button>' +
@@ -617,13 +617,15 @@ function renderIdle(){
 }
 function renderSearch(){
   const n = norm(Q);
-  const hit = state.items.filter(function(r){ return norm(r.name).indexOf(n) >= 0; });
   const rank = function(r){
     const name = norm(r.name);
     if(name === n) return 0;
     if(name.indexOf(n) === 0) return 1;
-    return 2;
+    if(name.indexOf(n) >= 0) return 2;
+    if(norm(r.desc || '').indexOf(n) >= 0) return 3;
+    return -1;
   };
+  const hit = state.items.filter(function(r){ return rank(r) >= 0; });
   hit.sort(function(a, b){
     const x = rank(a) - rank(b);
     if(x) return x;
@@ -778,7 +780,7 @@ function openItemEditor(item){
       fld('货架小位置', 'mSmall', v.small, { placeholder: '例如 4-4' }) +
       fld('库存数量', 'mQty', v.qty === null ? '' : v.qty, { type: 'number', placeholder: '留空表示未录入', inputmode: 'numeric' }) +
       fld('方向备注（选填）', 'mNote', v.note, { placeholder: '例如 左侧' }),
-    note: '保存后会新增一条变更记录，写明改了什么、从多少改成多少；产品介绍点名称旁的 i 圆圈单独编辑。',
+    note: '保存后会新增一条变更记录，写明改了什么、从多少改成多少。',
     okText: isNew ? '添加' : '保存',
     onOk: function(){
       const name = txt($('mName').value);
@@ -823,8 +825,7 @@ function openItemDelete(item){
     title: '删除商品',
     body: '<div class="state" style="padding:0">确定删除「<strong>' + esc(item.name) + '</strong>」（' +
       esc(item.big) + ' · ' + esc(item.small) + '）吗？<br>删除后会留下一条删除记录，之后可以照着记录重新添加。</div>',
-    note: '删除后商品介绍也一起删除，变更记录里会留下这一条。',
-    okText: '确认删除',
+    note: '删除后商品介绍也一起删除，变更记录里会留下这一条。',    okText: '确认删除',
     onOk: function(){
       state.items = state.items.filter(function(r){ return r.id !== item.id; });
       pushLog('删除', item.name, item.big + ' · ' + item.small + '（原库存 ' +
@@ -841,14 +842,10 @@ function openDesc(item){
   const cur = txt(item.desc);
   openModal({
     title: '产品介绍',
-    body: '<div class="desc-meta"><b>' + esc(item.name) + '</b> · 大位置 ' + esc(item.big) +
-        ' · 小位置 ' + esc(item.small) + '</div>' +
-      '<div class="fld"><label for="mDesc">这个产品是什么、适配什么车、要注意什么</label>' +
-      '<textarea class="inp desc-input" id="mDesc" rows="6" placeholder="暂时不知道写什么可以先空着，以后想好了再来补。">' +
-      esc(cur) + '</textarea></div>' +
-      '<div class="desc-meta">' + (cur ? '当前 ' + cur.length + ' 字' : '现在是空的') + '</div>',
-    note: '介绍跟着商品一起保存，导出备份时也会一起带走。',
-    okText: '保存介绍',
+    body: '<div class="desc-meta"><b>' + esc(item.name) + '</b></div>' +
+      '<textarea class="inp desc-input" id="mDesc" rows="7" aria-label="产品介绍">' + esc(cur) + '</textarea>',
+    note: '',
+    okText: '保存',
     onOk: function(){
       const v = txt($('mDesc').value);
       if(v === txt(item.desc)){ closeModal(); return true; }
